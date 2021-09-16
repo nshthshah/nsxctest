@@ -1,0 +1,11 @@
+#!/bin/bash
+
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+cd "${DIR}"
+
+pushd ${DIR} &> /dev/null
+
+set -euo pipefail
+IFS=$'\n\t'
+
+./carthage-script bootstrap --platform iOS --cache-builds

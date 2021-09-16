@@ -1,0 +1,21 @@
+#import <NSXCTest/CDStructures.h>
+#import <NSXCTest/XCUIElementQuery.h>
+#import <NSXCTest/XCUIElement.h>
+#import <NSXCTest/XCElementSnapshot.h>
+#import <NSXCTest/XCAXClient_iOS.h>
+#import <NSXCTest/XCUIApplication.h>
+#import <NSXCTest/XCTestWDApplication.h>
+#import <NSXCTest/XCTestPrivateSymbols.h>
+#import <NSXCTest/XCUICoordinate.h>
+#import <NSXCTest/XCTestDriver.h>
+#import <NSXCTest/XCTestDaemonsProxy.h>
+#import <NSXCTest/XCTRunnerDaemonSession.h>
+#import <NSXCTest/XCRuntimeUtils.h>
+#import <NSXCTest/NSPredicate+NSXCTest.h>
+#import <NSXCTest/_XCTestCaseImplementation.h>
+#import <NSXCTest/XCTestCase.h>
+#import <NSXCTest/NSXCTestImplementationFailureHoldingProxy.h>
+#import <NSXCTest/XCUIDevice.h>
+#import <NSXCTest/XCTestXCAXClientProxy.h>
+#import <NSXCTest/XCTestXCodeCompatibility.h>
+
