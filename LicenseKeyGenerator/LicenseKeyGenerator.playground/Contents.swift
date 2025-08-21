@@ -179,7 +179,7 @@ public class LicenseKey: NSObject {
     private class func generateLicenseKey() {
         do {
             let expiredDate = "2021-10-10 11:05:08.145"
-            let digest = "com.viewglass.mobile.stage || \(expiredDate)".data(using: .utf8)!
+            let digest = "com.company.app || \(expiredDate)".data(using: .utf8)!
             let encrypted = try aes()!.encrypt(digest)
             print(encrypted.hexEncodedString())
         } catch {
