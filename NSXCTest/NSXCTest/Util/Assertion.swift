@@ -24,8 +24,8 @@ internal class Assertion: NSObject {
 ///
 public func AssertFail(message: String = "", function: String = #function, file: String = #file, line: Int = #line) {
     let logInfo = Assertion.logInfo(function: function, file: file, line: line) + message
-    NSLogger.error(message: message)
-    XCTAssertTrue(false, logInfo)
+    NSLogger.attach(message: message)
+    XCTAssertTrue(false, message)
 }
 
 /// `AssertTrue` will expect outcome should be true, if it isn't then it will stop execution and mark your test case as failed.
@@ -39,10 +39,10 @@ public func AssertFail(message: String = "", function: String = #function, file:
 ///   - outcome: Name of property
 ///   - message: Message
 ///
-public func AssertTrue(outcome: Bool, message: String, function: String = #function, file: String = #file, line: Int = #line) {
+public func AssertTrue(outcome: Bool, message: String, name: String = "Attachment", function: String = #function, file: String = #file, line: Int = #line) {
     let logInfo = Assertion.logInfo(function: function, file: file, line: line) + message
-    NSLogger.info(message: message)
-    XCTAssertTrue(outcome, logInfo)
+    NSLogger.attach(message: message, name: name)
+    XCTAssertTrue(outcome, message)
 }
 
 /// `AssertEqual` will veirfy actual and expected value.
@@ -59,8 +59,8 @@ public func AssertTrue(outcome: Bool, message: String, function: String = #funct
 public func AssertEqual(actual: String, expected: String, function: String = #function, file: String = #file, line: Int = #line) {
     let message = "Expected: \(expected); Actual: \(actual)"
     let logInfo = Assertion.logInfo(function: function, file: file, line: line) + message
-    NSLogger.info(message: message)
-    XCTAssert(actual == expected, logInfo)
+    NSLogger.attach(message: message)
+    XCTAssert(actual == expected, message)
 }
 
 /// `AssertEqual` will veirfy actual and expected value.
@@ -74,7 +74,8 @@ public func AssertEqual(actual: String, expected: String, function: String = #fu
 ///   - expression1: Actual value
 ///   - expression2: Expected value
 ///
-public func AssertEqual<T: Equatable>(_ expression1: T, _ expression2: T, function: String = #function, file: String = #file, line: Int = #line) {
-    XCTAssert(expression1 == expression1)
+public func AssertEqual<T: Equatable>(_ expression1: T, _ expression2: T, message: String, function: String = #function, file: String = #file, line: Int = #line) {
+    let logInfo = Assertion.logInfo(function: function, file: file, line: line) + message
+    NSLogger.attach(message: message)
+    XCTAssert(expression1 == expression1, message)
 }
-

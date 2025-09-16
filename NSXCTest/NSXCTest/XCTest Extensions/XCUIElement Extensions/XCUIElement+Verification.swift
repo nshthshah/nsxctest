@@ -20,7 +20,6 @@ public extension XCUIElement {
 
     @discardableResult
     func verifyPresent(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForPresent(timeOut)
@@ -54,7 +53,6 @@ public extension XCUIElement {
 
     @discardableResult
     func verifyNotPresent(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForNotPresent(timeOut)
@@ -88,7 +86,6 @@ public extension XCUIElement {
 
     @discardableResult
     func verifyVisible(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForVisible(timeOut)
@@ -122,7 +119,6 @@ public extension XCUIElement {
 
     @discardableResult
     func verifyNotVisible(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForNotVisible(timeOut)
@@ -156,7 +152,6 @@ public extension XCUIElement {
 
     @discardableResult
     func verifyEnabled(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForEnabled(timeOut)
@@ -190,7 +185,6 @@ public extension XCUIElement {
 
     @discardableResult
     func verifyNotEnabled(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForNotEnabled(timeOut)
@@ -224,7 +218,6 @@ public extension XCUIElement {
 
     @discardableResult
     func verifySelected(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForSelected(timeOut)
@@ -258,7 +251,6 @@ public extension XCUIElement {
 
     @discardableResult
     func verifyNotSelected(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForNotSelected(timeOut)
@@ -292,11 +284,10 @@ public extension XCUIElement {
     ///
 
     @discardableResult
-    func verifyForLabel(withMatching label: String, timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool {
-        NSLogger.info()
+    func verifyForLabel(withMatching label: String, comparisonOperator: StringComparisonOperator = .equals, timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool {
         var outcome = false
         do {
-            try waitForLabel(withMatching: label, timeOut: timeOut)
+            try waitForLabel(withMatching: label, comparisonOperator:comparisonOperator, timeOut: timeOut)
             outcome = true
         } catch {
             outcome = false
@@ -332,7 +323,6 @@ public extension XCUIElement {
 
     @discardableResult
     func verifyForLabel(withNotMatching label: String, timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForLabel(withNotMatching: label, timeOut: timeOut)
@@ -371,7 +361,6 @@ public extension XCUIElement {
 
     @discardableResult
     func verifyForValue(withMatching value: String, timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForValue(withMatching: value, timeOut: timeOut)
@@ -409,7 +398,6 @@ public extension XCUIElement {
 
     @discardableResult
     func verifyForValue(withNotMatching value: String, timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForValue(withNotMatching: value, timeOut: timeOut)

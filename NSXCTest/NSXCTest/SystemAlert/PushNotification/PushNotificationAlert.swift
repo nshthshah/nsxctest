@@ -57,3 +57,21 @@ public func allowAccess(optional: Bool = false, alertClosure: @escaping (XCUIEle
     }
     return nil
 }
+
+public func denyAccess(optional: Bool = false, alertClosure: @escaping (XCUIElement) -> SystemAlertDeny?) -> NSObjectProtocol? {
+
+    if let currentTestCase = XCTestCase.currentTestCase {
+
+        return currentTestCase.addUIInterruptionMonitor(withDescription: "Deny Access request.") { alert -> Bool in
+            guard let alertView = alertClosure(alert) else {
+                if !optional {
+                    AssertFail(message: "Cannot create Deny System Alert object.")
+                }
+                return false
+            }
+            alertView.denyElement?.tapWithWait()
+            return true
+        }
+    }
+    return nil
+}

@@ -23,14 +23,12 @@ public extension XCUIDevice {
 
     /// Press Home button
     func home() {
-        NSLogger.info()
         self.press(.home)
         sleep(3)
     }
 
     /// Airplane Mode
     func setAirplaneMode(to expectedStatus: Bool) {
-        NSLogger.info()
         XCPlusApp.launchApplication(bundleIdentifier: SystemApp.settings.bundleId)
         let app = XCPlusApp.activeApplication()
         if let currentStatus = app.switches["Airplane Mode"].value as? Bool {
@@ -48,7 +46,6 @@ public extension XCUIDevice {
     /// Simulate Finger Touch
     #if targetEnvironment(simulator)
     func fingerTouchShouldMatch(shouldMatch: Bool) {
-        NSLogger.info(message: String(shouldMatch))
         if shouldMatch {
             NotificationCenter.default.post(name: .fingerTouchMatch, object: nil)
         } else {
@@ -58,7 +55,6 @@ public extension XCUIDevice {
 
     /// Simulate Face Id
     func faceIdShouldMatch(shouldMatch: Bool) {
-        NSLogger.info(message: String(shouldMatch))
         if shouldMatch {
             NotificationCenter.default.post(name: .faceIdMatch, object: nil)
         } else {
@@ -76,7 +72,7 @@ public extension XCUIDevice {
          if element.exists {
              message = element.value as? String ?? "No Status for Cellular"
          }
-         NSLogger.info(message: message)
+         NSLogger.attach(message: message)
          return message
      }
 
@@ -88,7 +84,7 @@ public extension XCUIDevice {
          if element.exists {
              message = element.value as? String ?? "No Status Wi-Fi bars"
          }
-         NSLogger.info(message: message)
+         NSLogger.attach(message: message)
          return message
      }
 }

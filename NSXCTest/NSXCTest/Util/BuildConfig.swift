@@ -3,7 +3,6 @@ import Foundation
 public enum BuildConfig: String {
 
     case autBundleId
-    case licenseKey
     case any
 
     /// Get value
@@ -20,11 +19,26 @@ public enum BuildConfig: String {
     public var isExists: Bool {
         return self.isExists(key: self.rawValue)
     }
+    
+    /// Get Build Config
+    public var buildConfig: JsonType {
+        return Bundle.xctrunnerBundle.buildConfigInfo()
+    }
 
     /// Get value for key
     public func value(key: String) -> String? {
         let buildConfigsInfo = Bundle.xctrunnerBundle.buildConfigInfo()
         return buildConfigsInfo[key] as? String
+    }
+
+    /// Get boolean for key
+    public func bool(key: String) -> Bool {
+        if self.isExists(key: key) {
+            let buildConfigsInfo = Bundle.xctrunnerBundle.buildConfigInfo()
+            guard let value = buildConfigsInfo[key] as? String else { return false }
+            return Bool(value) ?? false
+        }
+        return false
     }
 
     /// Get list value for key

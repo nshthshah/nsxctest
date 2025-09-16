@@ -24,9 +24,33 @@ public extension XCUIElement {
     ///
 
     var isVisible: Bool {
-        let returnValue = exists && isHittable
-        NSLogger.info(message: String(returnValue))
+        var returnValue = false
+        if exists {
+            if hasValidHitPoint() {
+                if isHittable {
+                    returnValue = true
+                }
+            }
+        }
+        NSLogger.attach(message: "isVisible : \(returnValue)")
         return returnValue
+    }
+
+    var isReallyVisible: Bool {
+        guard self.exists, !self.frame.isEmpty else {
+            return false
+        }
+
+        let elementFrame = self.frame
+        let windowFrame = app.windows.firstMatch.frame
+
+        let intersection = elementFrame.intersection(windowFrame)
+        let intersectionArea = intersection.width * intersection.height
+        let elementArea = elementFrame.width * elementFrame.height
+
+        let visiblePercentage = (intersectionArea / elementArea) * 100
+
+        return visiblePercentage >= 1 && self.isHittable
     }
 
     /// Returns `value` as a String
@@ -48,7 +72,6 @@ public extension XCUIElement {
         guard let text = value as? String else {
             return ""
         }
-        NSLogger.info(message: text)
         return text
     }
 
@@ -67,7 +90,6 @@ public extension XCUIElement {
 
     var hasKeyboardFocus: Bool {
         let returnValue = (self.getPropertyName(ElementProperty.hasKeyboardFocus.value) as? Bool) ?? false
-        NSLogger.info(message: String(returnValue))
         return returnValue
     }
 
@@ -124,7 +146,7 @@ public extension XCUIElement {
             }
         }
 
-        NSLogger.info(message: value as? String ?? "")
+        NSLogger.attach(message: value as? String ?? "")
         return value as Any
     }
 
@@ -147,7 +169,6 @@ public extension XCUIElement {
         } else if !self.label.isEmpty {
             returnValue = self.label
         }
-        NSLogger.info(message: returnValue)
         return returnValue
     }
 
@@ -172,7 +193,6 @@ public extension XCUIElement {
         } else {
             returnValue = name
         }
-        NSLogger.info(message: returnValue ?? "")
         return returnValue
     }
 
@@ -190,7 +210,6 @@ public extension XCUIElement {
 
     func wdType() -> String {
         let returnValue = XCUIElementTypeTransformer.shared.stringWithElementType(self.elementType)
-        NSLogger.info(message: returnValue)
         return returnValue
     }
 
@@ -208,7 +227,6 @@ public extension XCUIElement {
 
     func isWDEnabled() -> Bool {
         let returnValue = self.isEnabled
-        NSLogger.info(message: String(returnValue))
         return returnValue
     }
 
@@ -226,7 +244,6 @@ public extension XCUIElement {
 
     func wdFrame() -> CGRect {
         let returnValue = self.frame.integral
-        NSLogger.info(message: returnValue.debugDescription)
         return returnValue
     }
 
@@ -248,7 +265,6 @@ public extension XCUIElement {
             "y": self.frame.minY,
             "width": self.frame.width,
             "height": self.frame.height]
-        NSLogger.info(message: returnValue.debugDescription)
         return returnValue
     }
 
@@ -265,7 +281,6 @@ public extension XCUIElement {
     ///
 
     func checkLastSnapShot() -> XCElementSnapshot {
-        NSLogger.info()
         self.fb_nativeResolve()
         return self.fb_lastSnapshot()
     }
@@ -283,7 +298,6 @@ public extension XCUIElement {
     ///
 
     func customValue(forKey key: String) -> Any {
-        NSLogger.info()
         if key.lowercased().contains("enable") {
             return self.isEnabled
         } else if key.lowercased().contains("name") {
@@ -300,5 +314,16 @@ public extension XCUIElement {
             return self.fb_lastSnapshot().isAccessibile()
         }
         return ""
+    }
+
+    func hasValidHitPoint() -> Bool {
+        NSLogger.attach(message: "x: \(self.hitPointCoordinate.screenPoint.x), y: \(self.hitPointCoordinate.screenPoint.y)",
+                        name: "Hit Point")
+        if self.hitPointCoordinate.screenPoint.x > 0 &&
+            self.hitPointCoordinate.screenPoint.y > 0 {
+            return true
+        } else {
+            return false
+        }
     }
 }

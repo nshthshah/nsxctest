@@ -3,7 +3,6 @@
 //  InfostretchXCTest
 //
 //  Created by Nishith Shah on 07/02/20.
-//  Copyright © 2020 Nishith Shah. All rights reserved.
 //
 
 #import "UIDevice+SerialNumber.h"

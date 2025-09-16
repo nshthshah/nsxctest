@@ -21,7 +21,6 @@ public extension XCUIElement {
     ///
 
     func tapWithWait() {
-        NSLogger.info()
         ensurePresent()
         if isHittable {
             tap()
@@ -43,7 +42,6 @@ public extension XCUIElement {
     ///
 
     func clearTextField() {
-        NSLogger.info()
         ensurePresent()
         let deleteString = self.text.map { _ in XCUIKeyboardKey.delete.rawValue }.joined(separator: "")
         typeText(withText: deleteString)
@@ -65,7 +63,6 @@ public extension XCUIElement {
     ///
 
     func typeText(withText text: String) {
-        NSLogger.info()
         ensurePresent()
         if !hasKeyboardFocus {
             app.tap(at: Double(self.frame.size.width + self.frame.origin.x - 20), and: Double(self.frame.origin.y + 10))
@@ -92,7 +89,6 @@ public extension XCUIElement {
     ///
 
     func clear(andType text: String) {
-        NSLogger.info()
         clearTextField()
         typeText(withText: text)
     }
@@ -109,7 +105,6 @@ public extension XCUIElement {
     ///
 
     func keyBoardReturnKey() {
-        NSLogger.info()
         if hasKeyboardFocus {
             typeText(withText: XCUIKeyboardKey.return.rawValue)
         }
@@ -118,11 +113,11 @@ public extension XCUIElement {
     func setValue(_ value: String) {
         ensurePresent()
         if self.elementType == XCUIElement.ElementType.picker {
-            NSLogger.info(message: "setValue, set picker value \(value)")
+            NSLogger.attach(message: "setValue, set picker value \(value)")
             self.adjust(toPickerWheelValue: value)
 
         } else if self.elementType == XCUIElement.ElementType.slider {
-            NSLogger.info(message: "setValue, set slider value \(value)")
+            NSLogger.attach(message: "setValue, set slider value \(value)")
             self.adjust(toNormalizedSliderPosition: CGFloat((value as NSString).floatValue))
 
         } else if self.elementType == XCUIElement.ElementType.textField ||
@@ -154,7 +149,6 @@ public extension XCUIElement {
     ///
 
     func setDate(_ date: String) {
-        NSLogger.info()
         ensurePresent()
         self.pickerWheels.element(boundBy: 0).adjust(toPickerWheelValue: String(date.split(separator: "-")[0]))
         self.pickerWheels.element(boundBy: 1).adjust(toPickerWheelValue: String(date.split(separator: "-")[1]))
@@ -178,7 +172,6 @@ public extension XCUIElement {
     ///
 
     func setTime(_ time: String, format: String = "hh:mm a") {
-        NSLogger.info()
         ensurePresent()
 
         let dateFormatter = DateFormatter()

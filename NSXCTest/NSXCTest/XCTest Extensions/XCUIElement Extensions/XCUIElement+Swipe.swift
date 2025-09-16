@@ -17,23 +17,23 @@ public enum SwipeDirection: String {
 }
 
 public extension XCUIElement {
-
+    
     /// Scroll to the element till it is vibile.
+    /// This will scroll by using default scroll method.
     /// **Example:**
     ///
     /// ```swift
     /// let label = app.userNameLabel.element
     ///
     /// let label = CL.userNameLabel.element
-    /// label.scrollToVisible()
+    /// label.scrollTo()
     /// ```
     ///
     /// - Parameters:
     ///   - direction: Swipe direction (deault: Direction is up).
     ///   - maxNumberOfSwipes: Maximum number of swipes (by default 5).
     ///
-
-    func scrollToVisible(scrollDirection direction: ScrollDirection = .up, maxNumberOfSwipes: Int = 5) {
+    func scrollTo(scrollDirection direction: ScrollDirection = .up, maxNumberOfSwipes: Int = XCUIElement.defaultSwipesCount) {
         var maxCount = maxNumberOfSwipes
         let app = XCPlusApp.activeApplication()
         while maxCount > 0 {
@@ -53,6 +53,119 @@ public extension XCUIElement {
             }
             return
         }
+    }
+
+    /// Scroll to the element till it is vibile.
+    /// **Example:**
+    ///
+    /// ```swift
+    /// let label = app.userNameLabel.element
+    ///
+    /// let label = CL.userNameLabel.element
+    /// label.scrollToVisible()
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - direction: Swipe direction (deault: Direction is up).
+    ///   - maxNumberOfSwipes: Maximum number of swipes (by default 5).
+    ///   - offsetFromTop: Offset Value from 0 to 1
+    ///   - offsetFromBottom: Offset Value from 0 to 1
+    ///   - withVelocity: This will decide the speed of scroll (150 means 100.00 pixels per second)
+    ///   - waitAfterEachScroll: It will wait after each scroll
+    ///
+
+    func scrollToVisible(scrollDirection direction: ScrollDirection = .up, 
+                         maxNumberOfSwipes: Int = XCUIElement.defaultSwipesCount,
+                         offsetFromTop: Double = 0.2,
+                         offsetFromBottom: Double = 0.25,
+                         withVelocity: Int = 150,
+                         waitAfterEachScroll: Double = 0.2,
+                         thenHoldForDuration: Double = 0.001
+    ) {
+        
+        // 150 means 100.00 pixels per second        
+        XCTContext.runActivity(named: "Scroll to the element until it is visible") { _ in
+            
+            var maxCount = maxNumberOfSwipes
+            let app = XCPlusApp.activeApplication()
+            
+            let screenSize = app.windows.element(boundBy: 0).frame.size
+            
+            let startPoint = CGPoint(x: screenSize.width / 10, y: screenSize.height - offsetFromBottom * screenSize.height)
+            let endPoint = CGPoint(x: screenSize.width / 10, y: offsetFromTop * screenSize.height)
+            
+            let start = app.coordinate(withNormalizedOffset: CGVector(dx: startPoint.x / screenSize.width, dy: startPoint.y / screenSize.height))
+            let end = app.coordinate(withNormalizedOffset: CGVector(dx: endPoint.x / screenSize.width, dy: endPoint.y / screenSize.height))
+            
+            let velocity = XCUIGestureVelocity(integerLiteral: withVelocity)
+            NSLogger.attach(message: "Start Scrolling...", name: "Scrolling Event")
+            while maxCount > 0 {
+                if self.isReallyVisible {
+                    NSLogger.attach(message: "Element is Visible", name: "Element is Visible")
+                    return
+                } else {
+                    switch direction {
+                    case .up:
+                        start.press(forDuration: 0.001, thenDragTo: end, withVelocity: velocity, thenHoldForDuration: thenHoldForDuration)
+                    case .down:
+                        end.press(forDuration: 0.001, thenDragTo: start, withVelocity: velocity, thenHoldForDuration: thenHoldForDuration)
+                    case .left:
+                        app.swipeLeft()
+                    case .right:
+                        app.swipeRight()
+                    }
+                    maxCount -= 1
+                    sleep(UInt32(waitAfterEachScroll))
+                }
+            }
+        }
+    }
+    
+    /// Scrolls the element to make it visible on the screen.
+    ///
+    /// This method scrolls the element using the default scroll method until it is visible on the screen.
+    ///
+    /// **Example:**
+    /// ```swift
+    /// let label = app.userNameLabel.element
+    /// label.scrollTo()
+    /// ```
+    ///
+    /// - Parameters:
+    ///   - direction: The swipe direction. Defaults to up.
+    ///   - maxNumberOfSwipes: The maximum number of swipes. Defaults to 5.
+    ///
+    /// - Note: If the element is already visible on the screen, this method does nothing.
+    ///
+    /// - Warning: If the element cannot be scrolled into view after the maximum number of swipes, an assertion failure occurs.
+    ///
+    /// - Important: Make sure to use this method judiciously, as excessive scrolling may lead to unexpected behavior or performance issues.
+    func scrollToCenter() {
+        let app = XCPlusApp.activeApplication()
+        let appFrame = app.windows.element(boundBy: 0).frame
+        let screenSize = appFrame.size
+        let offsetFromTop = 0.25
+        let offsetFromBottom = 0.25
+        
+        let yDiff = appFrame.midY - self.frame.midY
+        
+        var startPoint = CGPointZero
+        
+        if self.frame.midY < appFrame.midY {
+            startPoint = CGPoint(x: screenSize.width / 10, y: offsetFromTop * screenSize.height)
+        } else {
+            startPoint = CGPoint(x: screenSize.width / 10, y: screenSize.height - offsetFromBottom * screenSize.height)
+        }
+        let endPoint = CGPoint(x: startPoint.x, y: startPoint.y + yDiff)
+        let start = app.coordinate(withNormalizedOffset: CGVector(dx: startPoint.x / screenSize.width, dy: startPoint.y / screenSize.height))
+        let end = app.coordinate(withNormalizedOffset: CGVector(dx: endPoint.x / screenSize.width, dy: endPoint.y / screenSize.height))
+        
+        if abs(start.normalizedOffset.dy - end.normalizedOffset.dy) < 0.02 {
+            return
+        }
+
+        let velocity = XCUIGestureVelocity(integerLiteral: 150)
+        start.press(forDuration: 0.001, thenDragTo: end, withVelocity: velocity, thenHoldForDuration: 0.001)
     }
 
     /// Default number of swipes.
@@ -147,7 +260,7 @@ public extension XCUIElement {
     /// ```swift
     /// let collectionView = app.collectionViews.element
     /// let element = collectionView.staticTexts["More"]
-    /// collectionView.swipe(to: .down, untilExist: element)
+    /// collectionView.swipe(to: .down, untilExists: element)
     /// ```
     ///
     /// - note:
@@ -160,9 +273,9 @@ public extension XCUIElement {
     ///   - app: Application instance to use when searching for keyboard to avoid.
     ///
 
-    func swipe(to direction: SwipeDirection, times: Int = XCUIElement.defaultSwipesCount, avoid viewsToAvoid: [AvoidableElement] = [.keyboard, .navigationBar], from app: XCUIApplication = XCUIApplication()) {
+    func swipe(to direction: SwipeDirection, untilExists element: XCUIElement, times: Int = XCUIElement.defaultSwipesCount, avoid viewsToAvoid: [AvoidableElement] = [.keyboard, .navigationBar], from app: XCUIApplication = XCUIApplication()) {
 
-        swipe(to: direction, times: times, avoid: viewsToAvoid, from: app, until: self.exists)
+        swipe(to: direction, times: times, avoid: viewsToAvoid, from: app, until: element.exists)
     }
 
     /// Swipes scroll view to given direction until element would be visible.

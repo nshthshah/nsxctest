@@ -87,4 +87,32 @@ public extension XCUIElement {
         }
         return matchingElements
     }
+    
+    /// :nodoc:
+    func elementQueryFromClassChain(classChainQuery: String) -> XCUIElementQuery {
+        var matchingElements = [XCUIElement]()
+
+        var lookupChain = ClassChainQueryParser(classChainQuery: classChainQuery).classChainItems
+
+        var currentRoot = self
+        var chainItem = lookupChain[0]
+        var query = currentRoot.queryWith(classChainItem: chainItem, query: nil)
+        lookupChain.remove(at: 0)
+
+        while !lookupChain.isEmpty {
+            var isRootChanged = false
+
+            if let position = chainItem.position {
+                currentRoot = query.element(boundBy: position)
+                isRootChanged = true
+            }
+            chainItem = lookupChain[0]
+            query = currentRoot.queryWith(classChainItem: chainItem, query: isRootChanged ? nil : query)
+            lookupChain.remove(at: 0)
+        }
+        if let position = chainItem.position {
+            return query.element(boundBy: position).children(matching: .any)
+        }
+        return query
+    }
 }

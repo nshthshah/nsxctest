@@ -92,7 +92,7 @@ public func getMethodNamesForClassNamed(classname: String) -> [Method] {
     if let cls: AnyClass = maybeClass {
         return getMethodNamesForClass(cls: cls)
     } else {
-        NSLogger.error(message: "\(classname): no such class")
+        NSLogger.attach(message: "\(classname): no such class")
     }
     return []
 }

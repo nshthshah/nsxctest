@@ -18,6 +18,8 @@ public extension Bundle {
         case bundleName = "CFBundleName"
         /// CFBundleExecutable
         case namespace = "CFBundleExecutable"
+        /// CFBundleShortVersionString
+        case shortBundleVersion = "CFBundleShortVersionString"
     }
 
     class internal var nsxctestFrameworkBundle: Bundle {

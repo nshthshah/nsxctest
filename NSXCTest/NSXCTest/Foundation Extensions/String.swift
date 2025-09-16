@@ -1,6 +1,15 @@
 import Foundation
+import CryptoKit
 
 public extension String {
+    
+    func formatKeys(withValues values: [String: String]) -> String {
+        var result = self
+        for (key, value) in values {
+            result = result.replacingOccurrences(of: "${\(key)}", with: value)
+        }
+        return result
+    }
 
     /// Split string using regex.
     ///
@@ -161,6 +170,33 @@ public extension String {
     /// Convert string to boolean value
     var boolValue: Bool {
         return (self as NSString).boolValue
+    }
+    
+    /// Convert string to UUID
+    func toUUID() -> UUID {
+        // Convert the string to Data
+        guard let data = self.data(using: .utf8) else {
+            fatalError("Failed to convert string to data")
+        }
+        
+        // Hash the data using SHA-256
+        let hashedData = SHA256.hash(data: data)
+        
+        // Convert the hash to an array of bytes
+        var uuidBytes = [UInt8](repeating: 0, count: 16)
+        hashedData.withUnsafeBytes { bytes in
+            for i in 0..<16 {
+                uuidBytes[i] = bytes[i]
+            }
+        }
+        
+        // Convert the UUID bytes to a UUID
+        let uuid = UUID(uuid: (uuidBytes[0], uuidBytes[1], uuidBytes[2], uuidBytes[3],
+                               uuidBytes[4], uuidBytes[5], uuidBytes[6], uuidBytes[7],
+                               uuidBytes[8], uuidBytes[9], uuidBytes[10], uuidBytes[11],
+                               uuidBytes[12], uuidBytes[13], uuidBytes[14], uuidBytes[15]))
+        
+        return uuid
     }
 }
 

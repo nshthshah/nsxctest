@@ -1,5 +1,7 @@
 import Foundation
 import SystemConfiguration
+import MachO
+import Darwin
 
  /// :nodoc:
 public typealias MemoryUsage = (used: UInt64, total: UInt64, message: String)
@@ -32,7 +34,6 @@ public class PerformanceMonitoring: NSObject {
         let usedMemory = Double(used) / bytesInMegabyte
         let totalMemory = Double(total) / bytesInMegabyte
         let message = String(format: "%.1f of %.0f MB used", usedMemory, totalMemory)
-        NSLogger.info(message: message)
         return (used, total, message)
     }
 
@@ -70,88 +71,43 @@ public class PerformanceMonitoring: NSObject {
 
         vm_deallocate(mach_task_self_, vm_address_t(UInt(bitPattern: threadsList)), vm_size_t(Int(threadsCount) * MemoryLayout<thread_t>.stride))
         let message = String(format: "%.2f total Usage Of CPU", totalUsageOfCPU)
-        NSLogger.info(message: message)
         return (totalUsageOfCPU, message)
     }
 
     /// Get Download Speed
     public class func downloadSpeed() -> DownloadSpeed {
-        var zeroAddress = sockaddr_in()
-        zeroAddress.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
-        zeroAddress.sin_family = sa_family_t(AF_INET)
-
-        guard let defaultRouteReachability = withUnsafePointer(to: &zeroAddress, {
-            $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
-                SCNetworkReachabilityCreateWithAddress(nil, $0)
-            }
-        }) else {
-            return (0.0, "Network Unreachable - Zero Address")
-        }
-
-        var flags: SCNetworkReachabilityFlags = []
-        if !SCNetworkReachabilityGetFlags(defaultRouteReachability, &flags) {
-            return (0.0, "Network Unreachable - Check Flags")
-        }
-
-        let isReachable = flags.contains(.reachable)
-        let needsConnection = flags.contains(.connectionRequired)
-        let netowrk = Network()
-        netowrk.isRunning = true
-        netowrk.testDownloadSpeedWithTimout(timeout: 5.0) { _, error -> Void in
-            if (error == nil) && isReachable && !needsConnection {
-            }
-            netowrk.isRunning = false
-        }
-        while netowrk.isRunning { }
-        NSLogger.info(message: netowrk.downloadingSpeed.message)
-        return netowrk.downloadingSpeed
-    }
-}
-
-private class Network: NSObject, URLSessionDelegate, URLSessionDataDelegate {
-
-    var startTime: CFAbsoluteTime!
-    var stopTime: CFAbsoluteTime!
-    var bytesReceived: Int!
-    var isRunning = true
-    var speedTestCompletionHandler: ((_ megabytesPerSecond: Double?, _ error: Error?) -> Void)!
-    var downloadingSpeed: DownloadSpeed = (0.0, "Network Unreachable - Zero Address")
-
-    func testDownloadSpeedWithTimout(timeout: TimeInterval, completionHandler:@escaping (_ megabytesPerSecond: Double?, _ error: Error?) -> Void) {
         let urlString = "https://www.nhc.noaa.gov/tafb_latest/USA_latest.pdf"
-
         guard let url = URL(string: urlString) else {
-            return
+            return (0.0, "Invalid URL")
         }
 
-        startTime = CFAbsoluteTimeGetCurrent()
-        stopTime = startTime
-        bytesReceived = 0
-        speedTestCompletionHandler = completionHandler
+        let semaphore = DispatchSemaphore(value: 0)
 
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.timeoutIntervalForResource = timeout
-        let session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
-        session.dataTask(with: url).resume()
-    }
+        var result: DownloadSpeed = (0.0, "Download failed")
 
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        bytesReceived += data.count
-        stopTime = CFAbsoluteTimeGetCurrent()
-    }
+        let startTime = CFAbsoluteTimeGetCurrent()
 
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        let elapsed = stopTime - startTime
-        guard elapsed != 0 && error == nil else {
-            speedTestCompletionHandler(nil, error)
-            self.downloadingSpeed = (0.0, String(describing: error))
-            return
+        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            let endTime = CFAbsoluteTimeGetCurrent()
+            let duration = endTime - startTime
+
+            if let error = error {
+                result = (0.0, "Download failed: \(error.localizedDescription)")
+            } else if let data = data {
+                let bytes = Double(data.count)
+                let bits = bytes * 8
+                let speedMbps = (bits / duration) / 1_000_000
+                let message = String(format: "%.2f Mbps download speed", speedMbps)
+                result = (speedMbps, message)
+            }
+
+            semaphore.signal()
         }
 
-        let speed = elapsed != 0 ? Double(bytesReceived) / elapsed / 1024.0 / 1024.0 : -1
-        let message = String(format: "%.2f MBPs", speed)
-        self.downloadingSpeed = (speed, message)
-        speedTestCompletionHandler(speed, nil)
-    }
+        task.resume()
+        semaphore.wait()
 
+        return result
+    }
 }
+

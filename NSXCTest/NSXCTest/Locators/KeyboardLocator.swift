@@ -80,4 +80,7 @@ public enum KeyboardLocator: String, Locator {
 
     /// Keyboards Setting Panel
     case keyboardLanguage = "class-chain=**/XCUIElementTypeCell[`label == \"%@\"`]"
+
+    /// Continue Button for sliding finger
+    case `continue` = "Continue"
 }

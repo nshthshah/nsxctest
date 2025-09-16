@@ -45,7 +45,7 @@ public extension Date {
         }
         return date
     }
-    
+
     /// Hour
     var hour: Int {
         let component = Calendar.current.dateComponents([.hour], from: self)
@@ -512,7 +512,7 @@ public enum Weekday: String {
 }
 
 public extension Date {
-    
+
     func getWeekDaysInEnglish() -> [String] {
         var calendar = Calendar(identifier: .gregorian)
         calendar.locale = Locale(identifier: "en_US_POSIX")
@@ -532,7 +532,7 @@ public extension Date {
           }
         }
     }
-    
+
     func next(_ weekday: Weekday, considerToday: Bool = false) -> Date {
         return get(.next,
                weekday,
@@ -544,7 +544,7 @@ public extension Date {
                weekday,
                considerToday: considerToday)
     }
-    
+
     func get(_ direction: SearchDirection,
              _ weekDay: Weekday,
              considerToday consider: Bool = false) -> Date {

@@ -10,7 +10,6 @@ public extension XCUIApplication {
     ///
 
     private func launchedApplicationWithCleanState() {
-        NSLogger.info()
         let launchArguments: [[String]] = [["-StartFromCleanState", "YES"]]
         launchArguments.forEach { self.launchArguments += $0 }
         launch()
@@ -30,7 +29,6 @@ public extension XCUIApplication {
     ///
 
     func launchedApplicationWithArguments(launchArguments: [[String]] = []) {
-        NSLogger.info()
         launchArguments.forEach { self.launchArguments += $0 }
         launch()
     }
@@ -48,7 +46,6 @@ public extension XCUIApplication {
     ///
 
     func background(forSeconds seconds: UInt32) {
-        NSLogger.info()
         XCUIDevice.shared.press(.home)
         sleep(seconds)
         activate()
@@ -64,7 +61,6 @@ public extension XCUIApplication {
     ///
 
     func background() {
-        NSLogger.info()
         XCUIDevice.shared.press(.home)
     }
 
@@ -78,7 +74,6 @@ public extension XCUIApplication {
     ///
 
     func foreground() {
-        NSLogger.info()
         activate()
     }
 
@@ -96,7 +91,6 @@ public extension XCUIApplication {
     ///
 
     var isRunningOnSimulator: Bool {
-        NSLogger.info()
         #if targetEnvironment(simulator)
             return true
         #else

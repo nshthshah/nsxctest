@@ -4,6 +4,23 @@
 
 @implementation XCTestWDApplication
 
++ (NSArray<XCUIApplication *> *)activeApplications
+{
+    NSArray<id> *activeApplicationElements = ((NSArray*)[[XCTestXCAXClientProxy sharedClient] activeApplications]);
+    NSMutableArray<XCUIApplication *> *result = [NSMutableArray array];
+    
+    if (activeApplicationElements.count > 0) {
+        for (id applicationElement in activeApplicationElements) {
+            XCUIApplication* application = [XCTestWDApplication createByPID:[[applicationElement valueForKey:@"processIdentifier"] intValue]];            
+            if (nil != application) {
+              [result addObject:application];
+            }
+        }
+    }
+    
+    return result.copy;
+}
+
 + (XCUIApplication*)activeApplication
 {
     id activeApplicationElement = ((NSArray*)[[XCTestXCAXClientProxy sharedClient] activeApplications]).lastObject;

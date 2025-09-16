@@ -1,16 +1,19 @@
+private var currentTestCaseKey: UInt8 = 0
+
 public extension XCTestCase {
 
     /// Timeout to locate an element
     class var defaultTimeOut: TimeInterval { return 60 }
 
-    private static var _currentTestCase: XCTestCase?
-
-    /// Object of `XCTestCase` which is executing
     class var currentTestCase: XCTestCase? {
-        get { return _currentTestCase }
-        set(currentTestCase) { _currentTestCase = currentTestCase }
+        get {
+            return objc_getAssociatedObject(self, &currentTestCaseKey) as? XCTestCase
+        }
+        set {
+            objc_setAssociatedObject(self, &currentTestCaseKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
     }
-    
+
     var elapsed: String {
         var outPut = ""
         let duration = Int(self.testRun?.totalDuration ?? 0)

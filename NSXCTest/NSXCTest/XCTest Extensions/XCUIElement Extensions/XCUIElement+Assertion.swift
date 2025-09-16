@@ -18,7 +18,6 @@ public extension XCUIElement {
     ///
 
     func assertPresent(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForPresent(timeOut)
@@ -47,7 +46,6 @@ public extension XCUIElement {
     ///
 
     func assertNotPresent(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForNotPresent(timeOut)
@@ -76,7 +74,6 @@ public extension XCUIElement {
     ///
 
     func assertVisible(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForVisible(timeOut)
@@ -105,7 +102,6 @@ public extension XCUIElement {
     ///
 
     func assertNotVisible(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForNotVisible(timeOut)
@@ -134,7 +130,6 @@ public extension XCUIElement {
     ///
 
     func assertEnabled(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForEnabled(timeOut)
@@ -163,7 +158,6 @@ public extension XCUIElement {
     ///
 
     func assertNotEnabled(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForNotEnabled(timeOut)
@@ -192,7 +186,6 @@ public extension XCUIElement {
     ///
 
     func assertSelected(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForSelected(timeOut)
@@ -221,7 +214,6 @@ public extension XCUIElement {
     ///
 
     func assertNotSelected(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForNotSelected(timeOut)
@@ -251,7 +243,6 @@ public extension XCUIElement {
     ///
 
     func assertForLabel(withMatching label: String, timeOut: TimeInterval = XCTestCase.defaultTimeOut) {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForLabel(withMatching: label, timeOut: timeOut)
@@ -285,7 +276,6 @@ public extension XCUIElement {
     ///
 
     func assertForLabel(withNotMatching label: String, timeOut: TimeInterval = XCTestCase.defaultTimeOut) {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForLabel(withNotMatching: label, timeOut: timeOut)
@@ -319,7 +309,6 @@ public extension XCUIElement {
     ///
 
     func assertForValue(withMatching value: String, timeOut: TimeInterval = XCTestCase.defaultTimeOut) {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForValue(withMatching: value, timeOut: timeOut)
@@ -353,7 +342,6 @@ public extension XCUIElement {
     ///
 
     func assertForValue(withNotMatching value: String, timeOut: TimeInterval = XCTestCase.defaultTimeOut) {
-        NSLogger.info()
         var outcome = false
         do {
             try waitForValue(withNotMatching: value, timeOut: timeOut)

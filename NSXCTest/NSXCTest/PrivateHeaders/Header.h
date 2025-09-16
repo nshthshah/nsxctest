@@ -18,4 +18,6 @@
 #import <NSXCTest/XCUIDevice.h>
 #import <NSXCTest/XCTestXCAXClientProxy.h>
 #import <NSXCTest/XCTestXCodeCompatibility.h>
+#import <NSXCTest/NSPasteboard.h>
+#import <NSXCTest/FBConfiguration.h>
 

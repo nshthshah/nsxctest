@@ -11,7 +11,6 @@ public extension KeyboardEvents {
     ///
 
     func hideKeyboard() {
-        NSLogger.info()
         let keyboard = XCPlusApp.activeApplication().keyboards.element
         if keyboard.isVisible {
             if UIDevice.current.isIpad {
@@ -24,7 +23,7 @@ public extension KeyboardEvents {
                 keyboard.buttons[KeyboardLocator.return].tapWithWait()
             }
         } else {
-            NSLogger.error(message: "Keyboard is not visible")
+            NSLogger.attach(message: "Keyboard is not visible", name: "Hide Keyboard")
         }
     }
 
@@ -35,13 +34,13 @@ public extension KeyboardEvents {
     func dismissKeyboard() {
         XCTestDaemonsProxy.testRunnerProxy()._XCT_send("\n", maximumFrequency: 60) { error in
             if error != nil {
-                print("Error occured in sending key: \(error.debugDescription)")
+                NSLogger.attach(message: "Error occured in sending key: \(error.debugDescription)", name: "Dismiss Keyboard")
             }
         }
     }
 
     func switchKeyboard(toLanguage language: String) {
-        NSLogger.info(message: language)
+        NSLogger.attach(message: language)
         let app = XCPlusApp.activeApplication()
 
         let keyboard = app.keyboards.element
@@ -51,7 +50,7 @@ public extension KeyboardEvents {
                 KeyboardLocator.keyboardLanguage.element(arguments: language).tapWithWait()
             }
         } else {
-            NSLogger.error(message: "Keyboard is not visible")
+            NSLogger.attach(message: "Keyboard is not visible", name: "Switch Keyboard")
         }
 
     }
@@ -81,7 +80,6 @@ extension CommonEvents {
     }
 
     func idle(forSeconds seconds: Int) {
-        NSLogger.info(message: "\(seconds) Seconds")
         CFRunLoopRunInMode(CFRunLoopMode.defaultMode, TimeInterval(seconds), true)
     }
 }

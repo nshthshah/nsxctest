@@ -23,8 +23,12 @@ public protocol Locator {
 public extension Locator where Self: RawRepresentable, Self.RawValue == String {
     /// :nodoc:
     var identifier: String {
-        LicenseKey.shared.verifyLicenseKey()
         return rawValue
+    }
+    
+    func isVersionLessThanOrEqual(_ targetVersion: String) -> Bool {
+        let version = Bundle.xctrunnerBundle.stringInfoValue(for: .shortBundleVersion)
+        return version.compare(targetVersion, options: .numeric) != .orderedDescending
     }
 }
 

@@ -29,8 +29,8 @@ public enum Attribute: String {
     }
 }
 
-enum XCTestError: Error {
-    case noSuchElement
+struct NoSuchElement: Error {
+    let message: String
 }
 
 public extension XCUIElement {
@@ -40,21 +40,27 @@ public extension XCUIElement {
         for expectation in expectations {
             message += expectation.expectationDescription + "\n"
         }
-        NSLogger.info(message: message)
+        NSLogger.attach(message: message)
         let result = XCTWaiter().wait(for: expectations, timeout: timeOut)
-        if result != .completed {
-            throw XCTestError.noSuchElement
+        switch result {
+            case .completed: return
+            case .timedOut:
+                throw NoSuchElement(message: "Timeout: Expectation not fulfilled within \(timeOut)s. \(message)")
+            case .incorrectOrder:
+                throw NoSuchElement(message: "Incorrect Order: Expectations fulfilled out of order. \(message)")
+            case .invertedFulfillment:
+                throw NoSuchElement(message: "Inverted Fulfillment: Expected event not to happen, but it did. \(message)")
+            case .interrupted:
+                throw NoSuchElement(message: "Interrupted: Wait got cut off early. \(message)")
+            @unknown default:
+                throw NoSuchElement(message: "Unexpected XCTWaiter result. \(message)")
         }
     }
 
     internal func ensurePresent(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) {
-        NSLogger.info()
-        let expectation = XCTNSPredicateExpectation(predicate: Attribute.present.value,
-                                                    object: self)
-        do {
-            try wait(for: [expectation], timeOut: timeOut)
-        } catch {
-            AssertFail(message: "\(error)")
+        let exists = waitForExistence(withTimeout: timeOut)
+        if !exists {
+            AssertFail(message: "Element Not Present")
         }
     }
 
@@ -72,12 +78,11 @@ public extension XCUIElement {
     ///   - timeOut: Waiting time in seconds (default: 60 seconds).
     ///
 
-
     func waitForPresent(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws {
-        NSLogger.info()
-        let expectation = XCTNSPredicateExpectation(predicate: Attribute.present.value,
-                                                    object: self)
-        try wait(for: [expectation], timeOut: timeOut)
+        let exists = waitForExistence(withTimeout: timeOut)
+        if !exists {
+            throw NoSuchElement(message: "Timeout: Expectation not fulfilled within \(timeOut)s.")
+        }
     }
 
     /// Wait for an UI element not to exist in a view hierarchy.
@@ -94,9 +99,7 @@ public extension XCUIElement {
     ///   - timeOut: Waiting time in seconds (default: 60 seconds).
     ///
 
-
     func waitForNotPresent(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws {
-        NSLogger.info()
         let expectation = XCTNSPredicateExpectation(predicate: Attribute.notPresent.value,
                                                     object: self)
         try wait(for: [expectation], timeOut: timeOut)
@@ -116,9 +119,7 @@ public extension XCUIElement {
     ///   - timeOut: Waiting time in seconds (default: 60 seconds).
     ///
 
-
     func waitForVisible(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws {
-        NSLogger.info()
         let expectation = XCTNSPredicateExpectation(predicate: Attribute.visible.value,
                                                     object: self)
         try wait(for: [expectation], timeOut: timeOut)
@@ -138,9 +139,7 @@ public extension XCUIElement {
     ///   - timeOut: Waiting time in seconds (default: 60 seconds).
     ///
 
-
     func waitForNotVisible(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws {
-        NSLogger.info()
         let expectation = XCTNSPredicateExpectation(predicate: Attribute.notVisible.value,
                                                     object: self)
         try wait(for: [expectation], timeOut: timeOut)
@@ -160,9 +159,7 @@ public extension XCUIElement {
     ///   - timeOut: Waiting time in seconds (default: 60 seconds).
     ///
 
-
     func waitForEnabled(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws {
-        NSLogger.info()
         let expectation = XCTNSPredicateExpectation(predicate: Attribute.enabled.value,
                                                     object: self)
         try wait(for: [expectation], timeOut: timeOut)
@@ -182,9 +179,7 @@ public extension XCUIElement {
     ///   - timeOut: Waiting time in seconds (default: 60 seconds).
     ///
 
-
     func waitForNotEnabled(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws {
-        NSLogger.info()
         let expectation = XCTNSPredicateExpectation(predicate: Attribute.notEnabled.value,
                                                     object: self)
         try wait(for: [expectation], timeOut: timeOut)
@@ -204,9 +199,7 @@ public extension XCUIElement {
     ///   - timeOut: Waiting time in seconds (default: 60 seconds).
     ///
 
-
     func waitForSelected(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws {
-        NSLogger.info()
         let expectation = XCTNSPredicateExpectation(predicate: Attribute.selected.value,
                                                     object: self)
         try wait(for: [expectation], timeOut: timeOut)
@@ -226,9 +219,7 @@ public extension XCUIElement {
     ///   - timeOut: Waiting time in seconds (default: 60 seconds).
     ///
 
-
     func waitForNotSelected(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws {
-        NSLogger.info()
         let expectation = XCTNSPredicateExpectation(predicate: Attribute.notSelected.value,
                                                     object: self)
         try wait(for: [expectation], timeOut: timeOut)
@@ -249,11 +240,9 @@ public extension XCUIElement {
     ///   - label: Expected label value.
     ///
 
-
     func waitForLabel(withMatching text: String,
                       comparisonOperator: StringComparisonOperator = .equals,
                       timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws {
-        NSLogger.info()
         let predicate = NSPredicate(format: "label \(comparisonOperator.rawValue) %@", text)
         let expectation = XCTNSPredicateExpectation(predicate: predicate, object: self)
         try wait(for: [expectation], timeOut: timeOut)
@@ -274,11 +263,9 @@ public extension XCUIElement {
     ///   - label: Expected label value.
     ///
 
-
     func waitForLabel(withNotMatching text: String,
                       comparisonOperator: StringComparisonOperator = .notequals,
                       timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws {
-        NSLogger.info()
         let predicate = NSPredicate(format: "label \(comparisonOperator.rawValue) %@", text)
         let expectation = XCTNSPredicateExpectation(predicate: predicate, object: self)
         try wait(for: [expectation], timeOut: timeOut)
@@ -299,9 +286,7 @@ public extension XCUIElement {
     ///   - label: Expected label value.
     ///
 
-
     func waitForLabel(withPrefixed text: String, timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws {
-        NSLogger.info()
         try waitForLabel(withMatching: text, comparisonOperator: .beginsWith, timeOut: timeOut)
     }
 
@@ -320,11 +305,9 @@ public extension XCUIElement {
     ///   - value: Expected value.
     ///
 
-
     func waitForValue(withMatching value: String,
                       comparisonOperator: StringComparisonOperator = .equals,
                       timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws {
-        NSLogger.info()
         let predicate = NSPredicate(format: "value \(comparisonOperator.rawValue) %@", value)
         let expectation = XCTNSPredicateExpectation(predicate: predicate, object: self)
         try wait(for: [expectation], timeOut: timeOut)
@@ -345,11 +328,9 @@ public extension XCUIElement {
     ///   - value: Expected value.
     ///
 
-
     func waitForValue(withNotMatching value: String,
                       comparisonOperator: StringComparisonOperator = .notequals,
                       timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws {
-        NSLogger.info()
         let predicate = NSPredicate(format: "value \(comparisonOperator.rawValue) %@", value)
         let expectation = XCTNSPredicateExpectation(predicate: predicate, object: self)
         try wait(for: [expectation], timeOut: timeOut)
