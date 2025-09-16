@@ -76,7 +76,6 @@ let package = Package(
             ],
             linkerSettings: [
                 .linkedLibrary("xml2"),
-                .linkedFramework("XCTest", .when(platforms: [.iOS])),
                 .unsafeFlags(["-Wl,-U"])
             ]
         ),
@@ -94,9 +93,6 @@ let package = Package(
             path: "Sources/NSXCTest",
             resources: [
                 .process("SystemAlert/PushNotification")
-            ],
-            linkerSettings: [
-                .linkedFramework("XCTest", .when(platforms: [.iOS]))
             ]
         )
     ]
