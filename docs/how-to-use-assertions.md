@@ -1,28 +1,35 @@
 ## How to use assertions
 
-Assertion helpers that integrate with XCTest to fail fast with descriptive messages.
+Documented APIs from `XCUIElement+Assertion.swift`.
 
-### Examples
+### Methods
+
+- `assertPresent(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut)`
+- `assertNotPresent(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut)`
+- `assertVisible(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut)`
+- `assertNotVisible(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut)`
+- `assertEnabled(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut)`
+- `assertNotEnabled(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut)`
+- `assertSelected(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut)`
+- `assertNotSelected(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut)`
+- `assertForLabel(withMatching: String, timeOut: TimeInterval = XCTestCase.defaultTimeOut)`
+- `assertForLabel(withNotMatching: String, timeOut: TimeInterval = XCTestCase.defaultTimeOut)`
+- `assertForValue(withMatching: String, timeOut: TimeInterval = XCTestCase.defaultTimeOut)`
+- `assertForValue(withNotMatching: String, timeOut: TimeInterval = XCTestCase.defaultTimeOut)`
+
+### Usage
 
 ```swift
 import XCTest
 import NSXCTest
 
-final class ExampleTests: XCTestCase {
-    func testWelcome() {
-        let app = XCUIApplication()
-        app.launch()
+let app = XCUIApplication()
+let title = app.staticTexts["Welcome"]
 
-        let title = app.staticTexts["Welcome"]
-        title.shouldExist(timeout: 10)
-        title.shouldBeVisible()
-        title.shouldHaveLabel("Welcome")
-    }
-}
+title.assertPresent(10)
+title.assertVisible()
+title.assertForLabel(withMatching: "Welcome")
 ```
 
-### Notes
-- Prefer assertion helpers for must-have conditions; they fail the test on unmet expectations.
-- For optional checks or branching logic, use verification helpers instead.
 
 

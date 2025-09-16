@@ -1,31 +1,54 @@
 ## How to use element properties
 
-Helpers that expose convenient properties for `XCUIElement` and related snapshots.
+Documented APIs from `XCUIElement+Property.swift`.
 
-### Examples
+### Properties
+
+- `isVisible: Bool`
+- `isReallyVisible: Bool`
+- `text: String`
+- `hasKeyboardFocus: Bool`
+
+### Methods
+
+- `wdValue() -> Any`
+- `wdLabel() -> String`
+- `wdName() -> String?`
+- `wdType() -> String`
+- `isWDEnabled() -> Bool`
+- `wdFrame() -> CGRect`
+- `wdRect() -> [String: CGFloat]`
+- `checkLastSnapShot() -> XCElementSnapshot`
+- `customValue(forKey key: String) -> Any`
+- `hasValidHitPoint() -> Bool`
+
+### Usage
 
 ```swift
 import XCTest
 import NSXCTest
 
-let element = XCUIApplication().buttons["Continue"]
+let app = XCUIApplication()
+let field = app.textFields.element
 
-// Read common attributes safely
-let label = element.label
-let isEnabled = element.isEnabled
-let isVisible = element.isWDVisible?() ?? element.exists
+// Properties
+_ = field.isVisible
+_ = field.isReallyVisible
+_ = field.text
+_ = field.hasKeyboardFocus
 
-// Access geometry
-let rect = element.frame
-let x = rect.origin.x
-let width = rect.size.width
-
-// Snapshot-based info (if available in your target)
-_ = element.checkLastSnapShot()
+// Methods
+_ = field.wdValue()
+_ = field.wdLabel()
+_ = field.wdName()
+_ = field.wdType()
+_ = field.isWDEnabled()
+_ = field.wdFrame()
+_ = field.wdRect()
+_ = field.checkLastSnapShot()
+_ = field.customValue(forKey: "label")
+_ = field.hasValidHitPoint()
 ```
 
-### Notes
-- Some helpers rely on accessibility snapshots available only during UI tests.
-- Prefer using these computed properties over ad-hoc sleeps; they are designed to be safe with waits.
 
 

@@ -1,34 +1,37 @@
 ## How to use element verification
 
-Lightweight verification helpers that read state and return booleans/results without throwing test failures.
+Documented APIs from `XCUIElement+Verification.swift`.
 
-### Examples
+### Methods
+
+- `verifyPresent(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool`
+- `verifyNotPresent(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool`
+- `verifyVisible(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool`
+- `verifyNotVisible(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool`
+- `verifyEnabled(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool`
+- `verifyNotEnabled(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool`
+- `verifySelected(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool`
+- `verifyNotSelected(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool`
+- `verifyForLabel(withMatching: String, comparisonOperator: StringComparisonOperator = .equals, timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool`
+- `verifyForLabel(withNotMatching: String, timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool`
+- `verifyForValue(withMatching: String, timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool`
+- `verifyForValue(withNotMatching: String, timeOut: TimeInterval = XCTestCase.defaultTimeOut) -> Bool`
+
+### Usage
 
 ```swift
 import XCTest
 import NSXCTest
 
 let app = XCUIApplication()
-app.launch()
-
 let ok = app.buttons["OK"]
 
-// Verify existence/visibility quickly
-if ok.fb_isVisible() {
-    ok.tap()
-}
-
-// Verify text
-_ = ok.fb_label()
-
-// Verify enabled state
-if ok.isWDEnabled() {
-    // proceed
-}
+_ = ok.verifyPresent(10)
+_ = ok.verifyVisible(5)
+_ = ok.verifyEnabled(5)
+_ = ok.verifyForLabel(withMatching: "OK")
+_ = ok.verifyForValue(withNotMatching: "")
 ```
 
-### Notes
-- Use verification helpers in control flow; pair with assertion helpers for hard expectations.
-- All functions should be safe to call repeatedly, e.g., inside waits.
 
 

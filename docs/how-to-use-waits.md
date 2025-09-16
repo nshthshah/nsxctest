@@ -1,27 +1,37 @@
 ## How to use waits
 
-Robust waiting strategies built on top of XCTest expectations and polling.
+Documented APIs from `XCUIElement+Waiter.swift`.
 
-### Examples
+### Methods
+
+- `waitForPresent(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws`
+- `waitForNotPresent(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws`
+- `waitForVisible(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws`
+- `waitForNotVisible(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws`
+- `waitForEnabled(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws`
+- `waitForNotEnabled(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws`
+- `waitForSelected(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws`
+- `waitForNotSelected(_ timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws`
+- `waitForLabel(withMatching: String, comparisonOperator: StringComparisonOperator = .equals, timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws`
+- `waitForLabel(withNotMatching: String, comparisonOperator: StringComparisonOperator = .notequals, timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws`
+- `waitForLabel(withPrefixed: String, timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws`
+- `waitForValue(withMatching: String, comparisonOperator: StringComparisonOperator = .equals, timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws`
+- `waitForValue(withNotMatching: String, comparisonOperator: StringComparisonOperator = .notequals, timeOut: TimeInterval = XCTestCase.defaultTimeOut) throws`
+
+### Usage
 
 ```swift
 import XCTest
 import NSXCTest
 
 let app = XCUIApplication()
-app.launch()
-
-// Wait for an element to exist/visible
 let login = app.buttons["Login"]
-XCTAssertTrue(login.waitForExistence(timeout: 10))
 
-// Using helpers that retry/poll internally
-_ = login.fb_waitUntilHittable(timeout: 10)
-_ = login.fb_waitUntilInvisible(timeout: 5)
+try? login.waitForPresent(10)
+try? login.waitForVisible(5)
+try? login.waitForEnabled(5)
+try? login.waitForLabel(withMatching: "Login")
 ```
 
-### Notes
-- Favor condition-based waits over fixed sleeps.
-- Combine waits with assertions for clear pass/fail signals.
 
 
