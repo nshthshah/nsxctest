@@ -76,7 +76,7 @@ let package = Package(
             ],
             linkerSettings: [
                 .linkedLibrary("xml2"),
-                .unsafeFlags(["-Wl,-U","_OBJC_CLASS_$_XCElementSnapshot"])
+                .unsafeFlags(["-Wl,-U"])
             ]
         ),
         .target(
