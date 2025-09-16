@@ -66,7 +66,9 @@ let package = Package(
                 "include/XCUICoordinate.h",
                 "include/XCUIDevice.h",
                 "include/XCUIElement.h",
-                "include/XCUIElementQuery.h"
+                "include/XCUIElementQuery.h",
+                "include/NSPasteboard.h",
+                "NSPasteboard.m"
             ],
             publicHeadersPath: "include",
             cSettings: [
