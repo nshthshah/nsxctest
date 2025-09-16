@@ -92,7 +92,6 @@ public extension XCUIElement {
     
     /// :nodoc:
     func elementQueryFromClassChain(classChainQuery: String) -> XCUIElementQuery {
-        var matchingElements = [XCUIElement]()
 
         var lookupChain = ClassChainQueryParser(classChainQuery: classChainQuery).classChainItems
 

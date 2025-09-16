@@ -27,7 +27,7 @@ internal class Assertion: NSObject {
 ///   - message: Error message
 ///
 public func AssertFail(message: String = "", function: String = #function, file: String = #file, line: Int = #line) {
-    let logInfo = Assertion.logInfo(function: function, file: file, line: line) + message
+    _ = Assertion.logInfo(function: function, file: file, line: line) + message
     NSLogger.attach(message: message)
     XCTAssertTrue(false, message)
 }
@@ -44,7 +44,7 @@ public func AssertFail(message: String = "", function: String = #function, file:
 ///   - message: Message
 ///
 public func AssertTrue(outcome: Bool, message: String, name: String = "Attachment", function: String = #function, file: String = #file, line: Int = #line) {
-    let logInfo = Assertion.logInfo(function: function, file: file, line: line) + message
+    _ = Assertion.logInfo(function: function, file: file, line: line) + message
     NSLogger.attach(message: message, name: name)
     XCTAssertTrue(outcome, message)
 }
@@ -62,7 +62,7 @@ public func AssertTrue(outcome: Bool, message: String, name: String = "Attachmen
 ///
 public func AssertEqual(actual: String, expected: String, function: String = #function, file: String = #file, line: Int = #line) {
     let message = "Expected: \(expected); Actual: \(actual)"
-    let logInfo = Assertion.logInfo(function: function, file: file, line: line) + message
+    _ = Assertion.logInfo(function: function, file: file, line: line) + message
     NSLogger.attach(message: message)
     XCTAssert(actual == expected, message)
 }
@@ -79,7 +79,7 @@ public func AssertEqual(actual: String, expected: String, function: String = #fu
 ///   - expression2: Expected value
 ///
 public func AssertEqual<T: Equatable>(_ expression1: T, _ expression2: T, message: String, function: String = #function, file: String = #file, line: Int = #line) {
-    let logInfo = Assertion.logInfo(function: function, file: file, line: line) + message
+    _ = Assertion.logInfo(function: function, file: file, line: line) + message
     NSLogger.attach(message: message)
     XCTAssert(expression1 == expression1, message)
 }
