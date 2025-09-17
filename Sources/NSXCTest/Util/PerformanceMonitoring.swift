@@ -40,15 +40,11 @@ public class PerformanceMonitoring: NSObject {
     /// Get CPU Usage
     public class func cpuUsage() -> CPUUsage {
         var totalUsageOfCPU: Double = 0.0
-        var threadsList = UnsafeMutablePointer(mutating: [thread_act_t]())
+        var threadsList: thread_act_array_t?
         var threadsCount = mach_msg_type_number_t(0)
-        let threadsResult = withUnsafeMutablePointer(to: &threadsList) {
-            return $0.withMemoryRebound(to: thread_act_array_t?.self, capacity: 1) {
-                task_threads(mach_task_self_, $0, &threadsCount)
-            }
-        }
+        let threadsResult = task_threads(mach_task_self_, &threadsList, &threadsCount)
 
-        if threadsResult == KERN_SUCCESS {
+        if threadsResult == KERN_SUCCESS, let threadsList = threadsList {
             for index in 0..<threadsCount {
                 var threadInfo = thread_basic_info()
                 var threadInfoCount = mach_msg_type_number_t(THREAD_INFO_MAX)
@@ -69,7 +65,10 @@ public class PerformanceMonitoring: NSObject {
             }
         }
 
-        vm_deallocate(mach_task_self_, vm_address_t(UInt(bitPattern: threadsList)), vm_size_t(Int(threadsCount) * MemoryLayout<thread_t>.stride))
+        if let threadsList = threadsList {
+            let size = vm_size_t(Int(threadsCount) * MemoryLayout<thread_t>.stride)
+            vm_deallocate(mach_task_self_, vm_address_t(UInt(bitPattern: threadsList)), size)
+        }
         let message = String(format: "%.2f total Usage Of CPU", totalUsageOfCPU)
         return (totalUsageOfCPU, message)
     }
