@@ -93,7 +93,9 @@ let package = Package(
             ],
             path: "Sources/NSXCTest",
             resources: [
-                .process("SystemAlert/PushNotification")
+                .process("SystemAlert/PushNotification/PushNotificationAlert.json"),
+                .process("SystemAlert/PushNotification/PushNotificationAlertAllow.json"),
+                .process("SystemAlert/PushNotification/PushNotificationAlertDeny.json")
             ],
             linkerSettings: [
                 .linkedFramework("XCTest", .when(platforms: [.iOS])),
