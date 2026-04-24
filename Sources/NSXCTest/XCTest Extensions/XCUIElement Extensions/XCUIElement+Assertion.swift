@@ -3,6 +3,21 @@ import XCTest
 
 public extension XCUIElement {
 
+    /// Asserts whether this element exists in the view hierarchy, using the default timeout.
+    /// When `shouldBePresent` is `true`, behaves like ``assertPresent()``; when `false`, like ``assertNotPresent()``.
+    ///
+    /// **Example:**
+    ///
+    /// ```swift
+    /// app.buttons["submit"].assertPresence(true)   // must appear
+    /// app.alerts["error"].assertPresence(false)    // must not appear
+    /// ```
+    ///
+    /// - Parameter shouldBePresent: Pass `true` to require the element to exist, or `false` to require it to be absent.
+    func assertPresence(_ shouldBePresent: Bool) {
+        shouldBePresent ? self.assertPresent() : self.assertNotPresent()
+    }
+
     /// Wait for an UI element to exist in a view hierarchy.
     /// After given time, if element is not found, test fails.
     ///

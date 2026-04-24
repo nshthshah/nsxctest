@@ -18,6 +18,14 @@ public enum SwipeDirection: String {
     }
 }
 
+/// Axis used by ``XCUIElement/scrollToCenter(axis:underElement:)``.
+public enum ScrollToCenterAxis {
+    /// Vertically align the element with the window center (default ``XCPlusApp/activeApplication()`` frame).
+    case vertical
+    /// Horizontally align the element with the container’s center; pass a scroll host via ``underElement`` when not the full app.
+    case horizontal
+}
+
 public extension XCUIElement {
     
     /// Scroll to the element till it is vibile.
@@ -76,7 +84,8 @@ public extension XCUIElement {
     ///   - waitAfterEachScroll: It will wait after each scroll
     ///
 
-    func scrollToVisible(scrollDirection direction: ScrollDirection = .up, 
+    func scrollToVisible(underElement: XCUIElement? = nil,
+                         scrollDirection direction: ScrollDirection = .up,
                          maxNumberOfSwipes: Int = XCUIElement.defaultSwipesCount,
                          offsetFromTop: Double = 0.2,
                          offsetFromBottom: Double = 0.25,
@@ -89,16 +98,17 @@ public extension XCUIElement {
         XCTContext.runActivity(named: "Scroll to the element until it is visible") { _ in
             
             var maxCount = maxNumberOfSwipes
-            let app = XCPlusApp.activeApplication()
-            
-            let screenSize = app.windows.element(boundBy: 0).frame.size
-            
+
+            let container = underElement ?? XCPlusApp.activeApplication()
+
+            let screenSize = container.windows.element(boundBy: 0).frame.size
+
             let startPoint = CGPoint(x: screenSize.width / 10, y: screenSize.height - offsetFromBottom * screenSize.height)
             let endPoint = CGPoint(x: screenSize.width / 10, y: offsetFromTop * screenSize.height)
             
-            let start = app.coordinate(withNormalizedOffset: CGVector(dx: startPoint.x / screenSize.width, dy: startPoint.y / screenSize.height))
-            let end = app.coordinate(withNormalizedOffset: CGVector(dx: endPoint.x / screenSize.width, dy: endPoint.y / screenSize.height))
-            
+            let start = container.coordinate(withNormalizedOffset: CGVector(dx: startPoint.x / screenSize.width, dy: startPoint.y / screenSize.height))
+            let end = container.coordinate(withNormalizedOffset: CGVector(dx: endPoint.x / screenSize.width, dy: endPoint.y / screenSize.height))
+
             let velocity = XCUIGestureVelocity(integerLiteral: withVelocity)
             NSLogger.attach(message: "Start Scrolling...", name: "Scrolling Event")
             while maxCount > 0 {
@@ -112,9 +122,9 @@ public extension XCUIElement {
                     case .down:
                         end.press(forDuration: 0.001, thenDragTo: start, withVelocity: velocity, thenHoldForDuration: thenHoldForDuration)
                     case .left:
-                        app.swipeLeft()
+                        container.swipe(from: CGVector(dx: 0.9, dy: 0.5), to: CGVector(dx: 0.3, dy: 0.5))
                     case .right:
-                        app.swipeRight()
+                        container.swipe(from: CGVector(dx: 0.3, dy: 0.5), to: CGVector(dx: 0.9, dy: 0.5))
                     }
                     maxCount -= 1
                     sleep(UInt32(waitAfterEachScroll))
@@ -123,51 +133,66 @@ public extension XCUIElement {
         }
     }
     
-    /// Scrolls the element to make it visible on the screen.
-    ///
-    /// This method scrolls the element using the default scroll method until it is visible on the screen.
-    ///
-    /// **Example:**
-    /// ```swift
-    /// let label = app.userNameLabel.element
-    /// label.scrollTo()
-    /// ```
+    /// Drags from a screen edge toward the window center so this element moves closer to the vertical or horizontal center.
     ///
     /// - Parameters:
-    ///   - direction: The swipe direction. Defaults to up.
-    ///   - maxNumberOfSwipes: The maximum number of swipes. Defaults to 5.
+    ///   - axis: Vertical alignment uses the window’s midY; horizontal uses the container’s midX (pass a scroll host when not the full app).
+    ///   - underElement: Coordinate space for the drag; defaults to the active application when `nil`.
     ///
-    /// - Note: If the element is already visible on the screen, this method does nothing.
-    ///
-    /// - Warning: If the element cannot be scrolled into view after the maximum number of swipes, an assertion failure occurs.
-    ///
-    /// - Important: Make sure to use this method judiciously, as excessive scrolling may lead to unexpected behavior or performance issues.
-    func scrollToCenter() {
+    /// - Note: Returns without dragging when the computed movement is negligible (normalized delta below 0.02).
+    func scrollToCenter(axis: ScrollToCenterAxis = .vertical, underElement: XCUIElement? = nil) {
         let app = XCPlusApp.activeApplication()
+        let container = underElement ?? app
         let appFrame = app.windows.element(boundBy: 0).frame
         let screenSize = appFrame.size
-        let offsetFromTop = 0.25
-        let offsetFromBottom = 0.25
-        
-        let yDiff = appFrame.midY - self.frame.midY
-        
-        var startPoint = CGPointZero
-        
-        if self.frame.midY < appFrame.midY {
-            startPoint = CGPoint(x: screenSize.width / 10, y: offsetFromTop * screenSize.height)
-        } else {
-            startPoint = CGPoint(x: screenSize.width / 10, y: screenSize.height - offsetFromBottom * screenSize.height)
-        }
-        let endPoint = CGPoint(x: startPoint.x, y: startPoint.y + yDiff)
-        let start = app.coordinate(withNormalizedOffset: CGVector(dx: startPoint.x / screenSize.width, dy: startPoint.y / screenSize.height))
-        let end = app.coordinate(withNormalizedOffset: CGVector(dx: endPoint.x / screenSize.width, dy: endPoint.y / screenSize.height))
-        
-        if abs(start.normalizedOffset.dy - end.normalizedOffset.dy) < 0.02 {
-            return
-        }
-
         let velocity = XCUIGestureVelocity(integerLiteral: 150)
-        start.press(forDuration: 0.001, thenDragTo: end, withVelocity: velocity, thenHoldForDuration: 0.001)
+
+        switch axis {
+        case .vertical:
+            let offsetFromTop = 0.25
+            let offsetFromBottom = 0.25
+            let yDiff = appFrame.midY - self.frame.midY
+            var startPoint = CGPoint.zero
+            if self.frame.midY < appFrame.midY {
+                startPoint = CGPoint(x: screenSize.width / 10, y: offsetFromTop * screenSize.height)
+            } else {
+                startPoint = CGPoint(x: screenSize.width / 10, y: screenSize.height - offsetFromBottom * screenSize.height)
+            }
+            let endPoint = CGPoint(x: startPoint.x, y: startPoint.y + yDiff)
+            let start = container.coordinate(withNormalizedOffset: CGVector(dx: startPoint.x / screenSize.width, dy: startPoint.y / screenSize.height))
+            let end = container.coordinate(withNormalizedOffset: CGVector(dx: endPoint.x / screenSize.width, dy: endPoint.y / screenSize.height))
+            if abs(start.normalizedOffset.dy - end.normalizedOffset.dy) < 0.02 {
+                return
+            }
+            start.press(forDuration: 0.001, thenDragTo: end, withVelocity: velocity, thenHoldForDuration: 0.001)
+
+        case .horizontal:
+            let offsetFromLeft = 0.25
+            let offsetFromRight = 0.75
+            // xDiff > 0 if element center point is left side from center point
+            // xDiff < 0 if element center point is right side from center point
+            let xDiff = container.frame.midX - self.frame.midX
+            var startPoint = CGPoint.zero
+            if self.frame.midX < appFrame.midX {
+                // Element is left side from center point
+                startPoint = CGPoint(x: offsetFromLeft * screenSize.width, y: container.frame.midY)
+            } else {
+                // Element is right side from center point
+                startPoint = CGPoint(x: offsetFromRight * screenSize.width, y: container.frame.midY)
+            }
+            let endPoint = CGPoint(x: startPoint.x + xDiff, y: container.frame.midY)
+            let start = container.coordinate(withNormalizedOffset: CGVector(dx: startPoint.x / screenSize.width, dy: startPoint.y / screenSize.height))
+            let end = container.coordinate(withNormalizedOffset: CGVector(dx: endPoint.x / screenSize.width, dy: endPoint.y / screenSize.height))
+            if abs(start.normalizedOffset.dx - end.normalizedOffset.dx) < 0.02 {
+                return
+            }
+            start.press(forDuration: 0.001, thenDragTo: end, withVelocity: velocity, thenHoldForDuration: 0.001)
+        }
+    }
+
+    @available(*, deprecated, message: "Use scrollToCenter(axis: .horizontal, underElement:) instead.")
+    func scrollToCenterHorizontally(underElement: XCUIElement) {
+        scrollToCenter(axis: .horizontal, underElement: underElement)
     }
 
     /// Default number of swipes.
