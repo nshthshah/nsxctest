@@ -24,3 +24,4 @@ Carthage/*
 **/Frameworks
 **/Docs/output
 **/Docs/tmp
+/.build
