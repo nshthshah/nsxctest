@@ -76,8 +76,7 @@ let package = Package(
             ],
             linkerSettings: [
                 .linkedLibrary("xml2"),
-                .linkedFramework("XCTest", .when(platforms: [.iOS])),
-                .unsafeFlags(["-Wl,-U,_OBJC_CLASS_$_XCElementSnapshot"])
+                .linkedFramework("XCTest", .when(platforms: [.iOS]))
             ]
         ),
         .target(
@@ -98,8 +97,7 @@ let package = Package(
                 .process("SystemAlert/PushNotification/PushNotificationAlertDeny.json")
             ],
             linkerSettings: [
-                .linkedFramework("XCTest", .when(platforms: [.iOS])),
-                .unsafeFlags(["-Wl,-U,_OBJC_CLASS_$_XCElementSnapshot"])
+                .linkedFramework("XCTest", .when(platforms: [.iOS]))
             ]
         )
     ]
