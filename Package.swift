@@ -17,8 +17,7 @@ let package = Package(
         .package(url: "https://github.com/httpswift/swifter.git", .upToNextMajor(from: "1.5.0")),
         .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", .upToNextMajor(from: "4.2.0")),
         .package(url: "https://github.com/cezheng/Fuzi.git", .upToNextMajor(from: "3.1.0")),
-        .package(url: "https://github.com/tadija/AEXML.git", .upToNextMajor(from: "4.6.0")),
-        .package(url: "https://github.com/CocoaLumberjack/CocoaLumberjack.git", .upToNextMajor(from: "3.4.0"))
+        .package(url: "https://github.com/tadija/AEXML.git", .upToNextMajor(from: "4.6.0"))
     ],
     targets: [
         .target(
@@ -87,9 +86,7 @@ let package = Package(
                 .product(name: "Swifter", package: "swifter"),
                 .product(name: "SwiftyJSON", package: "SwiftyJSON"),
                 .product(name: "Fuzi", package: "Fuzi"),
-                .product(name: "AEXML", package: "AEXML"),
-                .product(name: "CocoaLumberjack", package: "CocoaLumberjack"),
-                .product(name: "CocoaLumberjackSwift", package: "CocoaLumberjack")
+                .product(name: "AEXML", package: "AEXML")
             ],
             path: "Sources/NSXCTest",
             resources: [
